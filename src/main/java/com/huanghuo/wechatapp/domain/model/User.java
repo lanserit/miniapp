@@ -10,6 +10,8 @@ public class User implements Serializable {
     private long id;
     private String openid;
     private String nickname;
+    private String sessionkey;
+    private String unionid;
     private long ctime;
 
     public long getId() {
@@ -44,4 +46,19 @@ public class User implements Serializable {
         this.nickname = nickname;
     }
 
+    public String getSessionkey() {
+        return sessionkey;
+    }
+
+    public void setSessionkey(String sessionkey) {
+        this.sessionkey = sessionkey;
+    }
+
+    public String getUnionid() {
+        return unionid;
+    }
+
+    public void setUnionid(String unionid) {
+        this.unionid = unionid;
+    }
 }

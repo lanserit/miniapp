@@ -28,8 +28,12 @@ public class LotteryApplicationTests {
 	@Test
 	@Rollback
 	public void findByName() throws Exception {
-		userMapper.insert("AAA", "12344", System.currentTimeMillis());
+		User user = new User();
+		user.setNickname("AAA");
+		user.setOpenid("1231231");
+		user.setCtime(System.currentTimeMillis());
+		userMapper.insert(user);
 		User u = userMapper.findByNickName("AAA");
-		Assert.assertEquals("12344", u.getOpenid());
+		Assert.assertEquals("1231231", u.getOpenid());
 	}
 }

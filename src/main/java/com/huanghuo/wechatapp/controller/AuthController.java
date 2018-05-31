@@ -15,7 +15,6 @@ public class AuthController {
 
     @RequestMapping("/login")
     public boolean login() {
-        int count = userService.insert("hello", "12131");
-        return count > 0;
+        return true;
     }
 }

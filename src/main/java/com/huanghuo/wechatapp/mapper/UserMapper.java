@@ -9,12 +9,16 @@ import org.apache.ibatis.annotations.*;
 
 @Mapper
 public interface UserMapper {
-
     @Select("SELECT * FROM USER WHERE nickname = #{nickname}")
     User findByNickName(@Param("nickname") String nickname);
 
-    @Insert("INSERT INTO USER(nickname, openid, ctime) VALUES(#{nickname}, #{openid}, #{ctime})")
-    @Options(useGeneratedKeys = true, keyProperty = "id")
-    int insert(@Param("nickname") String nickname, @Param("openid") String openid, @Param("ctime") long ctime);
+    @Select("SELECT * FROM USER WHERE openid = #{openid}")
+    User findByOpenId(@Param("openid") String openid);
 
+    @Insert("INSERT INTO USER(nickname, openid, sessionkey, unionid, ctime) VALUES(#{nickname}, #{openid}, #{sessionkey}, #{unionid}, #{ctime})")
+    @Options(useGeneratedKeys = true, keyProperty = "id")
+    int insert(User user);
+
+    @Update("UPDATE User SET nickname=#{nickname}, sessionkey=#{sessionkey} WHERE openid=#{openid}")
+    int updateByOpenId(User user);
 }
