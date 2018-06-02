@@ -10,7 +10,6 @@ import com.google.common.collect.Maps;
 import com.huanghuo.util.JsonUtil;
 import com.qcloud.weapp.ConfigurationException;
 import org.apache.commons.collections.MapUtils;
-import org.springframework.stereotype.Service;
 
 /**
  * 提供登录服务
@@ -20,7 +19,7 @@ public class LoginServiceUtil {
     private static void write(HttpServletResponse response, Map<String, Object> map) {
         try {
             response.setContentType("application/json");
-            response.setCharacterEncoding("utf-8");
+            response.setCharacterEncoding("utf8");
             response.getWriter().print(JsonUtil.getJsonString(map));
         } catch (IOException e) {
             e.printStackTrace();

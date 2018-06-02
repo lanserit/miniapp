@@ -6,7 +6,6 @@ import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.util.HtmlUtils;
 
 /**
  * Created by huangcheng on 2018/5/30.
@@ -14,8 +13,9 @@ import org.springframework.web.util.HtmlUtils;
 @RestController
 public class IndexController {
     @RequestMapping("/index")
+    @ResponseBody
     public String index() {
-        return "Greetings from Spring Boot!";
+        return "你好 Greetings from Spring Boot!";
     }
 
     @MessageMapping("/user")
