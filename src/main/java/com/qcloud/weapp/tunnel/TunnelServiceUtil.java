@@ -12,6 +12,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import com.google.common.collect.Maps;
 import com.huanghuo.util.JsonUtil;
+import com.qcloud.weapp.HttpServletUtils;
 import org.apache.commons.collections.MapUtils;
 
 import com.qcloud.weapp.ConfigurationException;
@@ -26,16 +27,6 @@ import com.qcloud.weapp.authorization.UserInfo;
  * 提供信道服务
  */
 public class TunnelServiceUtil {
-    private static void write(HttpServletResponse response, Map<String, Object> ret) {
-        try {
-            response.setContentType("application/json");
-            response.setCharacterEncoding("utf-8");
-            response.getWriter().print(JsonUtil.getJsonString(ret));
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
     private static Map<String, Object> getMapForError(Exception error, int errorCode) {
         Map<String, Object> json = Maps.newHashMap();
         json.put("code", errorCode);
@@ -58,7 +49,7 @@ public class TunnelServiceUtil {
      * @param handler 指定信道处理器处理信道事件
      * @param options 指定信道服务的配置
      */
-    public static void handle(HttpServletRequest request, HttpServletResponse response, TunnelHandler handler, TunnelHandleOptions options) throws ConfigurationException {
+    public static void handle(HttpServletRequest request, HttpServletResponse response, TunnelHandler handler, TunnelHandleOptions options) throws Exception {
         if (request.getMethod().toUpperCase() == "GET") {
             handleGet(request, response, handler, options);
         }
@@ -73,7 +64,7 @@ public class TunnelServiceUtil {
      * GET 请求表示客户端请求进行信道连接，此时会向 SDK 申请信道连接地址，并且返回给客户端
      * 如果配置指定了要求登陆，还会调用登陆服务来校验登陆态并获得用户信息
      */
-    private static void handleGet(HttpServletRequest request, HttpServletResponse response, TunnelHandler handler, TunnelHandleOptions options) throws ConfigurationException {
+    private static void handleGet(HttpServletRequest request, HttpServletResponse response, TunnelHandler handler, TunnelHandleOptions options) throws Exception {
         Tunnel tunnel = null;
         UserInfo user = null;
 
@@ -86,19 +77,15 @@ public class TunnelServiceUtil {
         }
 
         TunnelAPI api = new TunnelAPI();
-        try {
-            String receiveUrl = buildReceiveUrl(request);
-            tunnel = api.requestConnect(receiveUrl);
-        } catch (Exception e) {
-            write(response, getMapForError(e));
-            return;
-        }
+        String receiveUrl = buildReceiveUrl(request);
+        tunnel = api.requestConnect(receiveUrl);
+
 
         Map<String, Object> result = Maps.newHashMap();
 
         result.put("url", tunnel.getConnectUrl());
 
-        write(response, result);
+        HttpServletUtils.writeToResponse(response, result);
 
         handler.onTunnelRequest(tunnel, user);
     }
@@ -111,20 +98,14 @@ public class TunnelServiceUtil {
         return schema + "://" + host + path;
     }
 
-    private static void handlePost(HttpServletRequest request, HttpServletResponse response, TunnelHandler handler, TunnelHandleOptions options) throws ConfigurationException {
+    private static void handlePost(HttpServletRequest request, HttpServletResponse response, TunnelHandler handler, TunnelHandleOptions options) throws ConfigurationException, IOException {
         String requestContent = null;
 
         // 1. 读取报文内容
-        try {
-            BufferedReader requestReader = new BufferedReader(new InputStreamReader(request.getInputStream(), StandardCharsets.UTF_8));
-            requestContent = "";
-            for (String line; (line = requestReader.readLine()) != null; ) {
-                requestContent += line;
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-            write(response, getMapForError(e));
-            return;
+        BufferedReader requestReader = new BufferedReader(new InputStreamReader(request.getInputStream(), StandardCharsets.UTF_8));
+        requestContent = "";
+        for (String line; (line = requestReader.readLine()) != null; ) {
+            requestContent += line;
         }
 
         // 2. 读取报文内容成 JSON 并保存在 body 变量中
@@ -140,7 +121,7 @@ public class TunnelServiceUtil {
             Map<String, Object> errMap = Maps.newHashMap();
             errMap.put("code", 9001);
             errMap.put("message", "Cant not parse the request body: invalid json");
-            write(response, errMap);
+            HttpServletUtils.writeToResponse(response, errMap);
         }
 
         // 3. 检查报文签名
@@ -149,7 +130,7 @@ public class TunnelServiceUtil {
             Map<String, Object> map = Maps.newHashMap();
             map.put("code", 9003);
             map.put("message", "Bad Request - 签名错误");
-            write(response, map);
+            HttpServletUtils.writeToResponse(response, map);
             return;
         }
 
@@ -169,12 +150,12 @@ public class TunnelServiceUtil {
             Map<String, Object> ret = Maps.newHashMap();
             ret.put("code", 0);
             ret.put("message", "OK");
-            write(response, ret);
+            HttpServletUtils.writeToResponse(response, ret);
         } else {
             Map<String, Object> ret = Maps.newHashMap();
             ret.put("code", 9004);
             ret.put("message", "Bad Request - 无法解析的数据包");
-            write(response, ret);
+            HttpServletUtils.writeToResponse(response, ret);
         }
 
         // 5. 交给客户处理实例处理报文

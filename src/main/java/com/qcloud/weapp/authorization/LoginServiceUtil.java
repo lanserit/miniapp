@@ -1,6 +1,5 @@
 package com.qcloud.weapp.authorization;
 
-import java.io.IOException;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
@@ -9,6 +8,7 @@ import javax.servlet.http.HttpServletResponse;
 import com.google.common.collect.Maps;
 import com.huanghuo.util.JsonUtil;
 import com.qcloud.weapp.ConfigurationException;
+import com.qcloud.weapp.HttpServletUtils;
 import org.apache.commons.collections.MapUtils;
 
 /**
@@ -16,16 +16,6 @@ import org.apache.commons.collections.MapUtils;
  */
 
 public class LoginServiceUtil {
-    private static void write(HttpServletResponse response, Map<String, Object> map) {
-        try {
-            response.setContentType("application/json");
-            response.setCharacterEncoding("utf8");
-            response.getWriter().print(JsonUtil.getJsonString(map));
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
     private static Map<String, Object> prepareResponseJson() {
         Map<String, Object> ret = Maps.newHashMap();
         ret.put(Constants.WX_SESSION_MAGIC_ID, 1);
@@ -64,7 +54,6 @@ public class LoginServiceUtil {
             loginResult = api.login(code, encryptedData, iv);
         } catch (AuthorizationAPIException apiError) {
             LoginServiceException error = new LoginServiceException(Constants.ERR_LOGIN_FAILED, apiError.getMessage(), apiError);
-            write(response, getJsonForError(error));
             throw error;
         }
 
@@ -73,7 +62,7 @@ public class LoginServiceUtil {
         session.put("id", loginResult.get("id"));
         session.put("skey", loginResult.get("skey"));
         json.put("session", session);
-        write(response, json);
+        HttpServletUtils.writeToResponse(response, json);
 
         Map<String, Object> userInfo = MapUtils.getMap(loginResult, "user_info");
 
@@ -99,7 +88,6 @@ public class LoginServiceUtil {
                 errorType = Constants.ERR_INVALID_SESSION;
             }
             LoginServiceException error = new LoginServiceException(errorType, apiError.getMessage(), apiError);
-            write(response, getJsonForError(error));
             throw error;
         }
         Map<String, Object> userInfo = MapUtils.getMap(checkLoginResult, "user_info");
@@ -111,7 +99,6 @@ public class LoginServiceUtil {
         String value = request.getHeader(key);
         if (value == null || value.isEmpty()) {
             LoginServiceException error = new LoginServiceException("INVALID_REQUEST", String.format("请求头不包含 %s，请配合客户端 SDK 使用", key));
-            write(response, getJsonForError(error));
             throw error;
         }
         return value;
