@@ -36,4 +36,5 @@ public class LotteryApplicationTests {
 		User u = userMapper.findByNickName("AAA");
 		Assert.assertEquals("1231231", u.getOpenid());
 	}
+
 }
