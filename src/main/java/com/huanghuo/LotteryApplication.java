@@ -11,7 +11,7 @@ import org.springframework.context.annotation.ComponentScan;
 @SpringBootApplication
 @EnableAutoConfiguration(exclude = {ErrorMvcAutoConfiguration.class})
 @EnableCaching
-@ComponentScan("com.huanghuo")
+@ComponentScan({"com.huanghuo", "com.qcloud.weapp"})
 @MapperScan("com.huanghuo.wechatapp.mapper")
 public class LotteryApplication {
 	public static void main(String[] args) {

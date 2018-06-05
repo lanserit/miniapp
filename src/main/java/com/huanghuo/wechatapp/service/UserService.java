@@ -30,4 +30,5 @@ public class UserService {
     public int updateByOpenId(User user){
         return userMapper.updateByOpenId(user);
     }
+
 }

@@ -3,7 +3,7 @@ package com.huanghuo.wechatapp.controller;
 import com.huanghuo.wechatapp.service.UserService;
 import com.qcloud.weapp.ConfigurationException;
 import com.qcloud.weapp.authorization.LoginServiceException;
-import com.qcloud.weapp.authorization.LoginServiceUtil;
+import com.qcloud.weapp.authorization.LoginService;
 import com.qcloud.weapp.authorization.UserInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,9 +22,11 @@ public class AuthController {
     private final static Logger logger = LoggerFactory.getLogger(AuthController.class);
     @Autowired
     private UserService userService;
-
+    @Autowired
+    private LoginService loginService;
     @RequestMapping("/login")
     public void login(HttpServletRequest request, HttpServletResponse response) throws LoginServiceException, ConfigurationException {
-        UserInfo userInfo = LoginServiceUtil.login(request, response);
+        UserInfo userInfo = loginService.login(request, response);
+        String openId = userInfo.getOpenId();
     }
 }

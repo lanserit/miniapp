@@ -21,4 +21,11 @@ public interface UserMapper {
 
     @Update("UPDATE User SET nickname=#{nickname}, sessionkey=#{sessionkey} WHERE openid=#{openid}")
     int updateByOpenId(User user);
+
+    @Update("UPDATE User SET attendcount=attendcount+1 WHERE openid=#{openid}")
+    int incrAttendCount(@Param("openid") String openid);
+
+    @Update("UPDATE User SET wincount=wincount+1 WHERE openid=#{openid}")
+    int incrWinCount(@Param("openid") String openid);
+
 }

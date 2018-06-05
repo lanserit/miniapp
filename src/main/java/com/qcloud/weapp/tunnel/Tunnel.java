@@ -41,7 +41,7 @@ public class Tunnel {
 	 * @param messageContent 消息内容，如果需要发送对象或者数组，需要使用 JSONObject 或 JSONArray 类型
 	 * */
 	public EmitResult emit(String messageType, Object messageContent) throws EmitError {
-		TunnelAPI api = new TunnelAPI();
+		TunnelAPIService api = new TunnelAPIService();
 		return api.emitMessage(new String[]{ tunnelId }, messageType, messageContent);
 	}
 	
@@ -49,7 +49,7 @@ public class Tunnel {
 	 * 关闭当前信道
 	 * */
 	public EmitResult close() throws EmitError {
-		TunnelAPI api = new TunnelAPI();
+		TunnelAPIService api = new TunnelAPIService();
 		return api.emitPacket(new String[]{ tunnelId }, "close", null);
 	}
 }

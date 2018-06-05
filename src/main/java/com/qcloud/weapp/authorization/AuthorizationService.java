@@ -6,17 +6,23 @@ import java.util.Map;
 
 import com.google.common.collect.Maps;
 import com.huanghuo.util.JsonUtil;
+import com.qcloud.weapp.Configuration;
 import com.qcloud.weapp.ConfigurationException;
-import com.qcloud.weapp.ConfigurationManager;
 import com.qcloud.weapp.HttpRequest;
 import org.apache.commons.collections.MapUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
-class AuthorizationAPI {
-    private final static Logger logger = LoggerFactory.getLogger(AuthorizationAPI.class);
+@Component
+class AuthorizationService {
+    private final static Logger logger = LoggerFactory.getLogger(AuthorizationService.class);
+
+    @Autowired
+    private Configuration configuration;
     private String getAPIUrl() throws ConfigurationException {
-        return ConfigurationManager.getCurrentConfiguration().getAuthServerUrl();
+        return configuration.getAuthServerUrl();
     }
 
     public Map<String, Object> login(String code, String encryptedData, String iv) throws AuthorizationAPIException, ConfigurationException {

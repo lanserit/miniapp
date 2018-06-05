@@ -13,6 +13,8 @@ public class User implements Serializable {
     private String sessionkey;
     private String unionid;
     private long ctime;
+    private int attendcount;
+    private int wincount;
 
     public long getId() {
         return id;
@@ -60,5 +62,21 @@ public class User implements Serializable {
 
     public void setUnionid(String unionid) {
         this.unionid = unionid;
+    }
+
+    public int getAttendcount() {
+        return attendcount;
+    }
+
+    public void setAttendcount(int attendcount) {
+        this.attendcount = attendcount;
+    }
+
+    public int getWincount() {
+        return wincount;
+    }
+
+    public void setWincount(int wincount) {
+        this.wincount = wincount;
     }
 }

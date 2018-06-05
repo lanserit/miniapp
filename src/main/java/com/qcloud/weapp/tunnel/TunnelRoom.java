@@ -68,7 +68,7 @@ public class TunnelRoom {
 	 * @param messageContent 要广播的消息的内容
 	 * */
 	public EmitResult broadcast(String messageType, Object messageContent) throws EmitError {
-		TunnelAPI api = new TunnelAPI();
+		TunnelAPIService api = new TunnelAPIService();
 		return api.emitMessage(tunnels.toArray(new Tunnel[] {}), messageType, messageContent);
 	}
 }

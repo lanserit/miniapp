@@ -45,7 +45,7 @@ public class WebMvcConfig extends WebMvcConfigurationSupport {
 
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
-        registry.addInterceptor(tokenVerifyInterceptor()).addPathPatterns("/login","/index");
+        registry.addInterceptor(tokenVerifyInterceptor()).addPathPatterns("/*").excludePathPatterns("/login","/index");
         super.addInterceptors(registry);
     }
 }

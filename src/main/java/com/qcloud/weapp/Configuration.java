@@ -3,13 +3,32 @@
  */
 package com.qcloud.weapp;
 
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.stereotype.Component;
+
 /**
  * 表示 SDK 配置
  * @see com.qcloud.weapp.ConfigurationManager
  * @see <a target="_blank" href="https://github.com/tencentyun/weapp-solution/wiki/%E6%9C%8D%E5%8A%A1%E7%AB%AF-SDK-%E9%85%8D%E7%BD%AE">服务端 SDK 配置</a>
  */
+
+@Component
+@ConfigurationProperties("weixinsdk")
 public class Configuration {
-	
+	private String _id = null;
+	public String getId() throws ConfigurationException {
+		if (_id == null) {
+			_id = Hash.md5(getServerHost());
+		}
+		return _id;
+	}
+
+	public String getKey() throws ConfigurationException {
+		return getTunnelSignatureKey();
+	}
+
 	/** The server host. */
 	private String serverHost;
 	

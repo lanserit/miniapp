@@ -10,12 +10,18 @@ import com.huanghuo.util.JsonUtil;
 import com.qcloud.weapp.ConfigurationException;
 import com.qcloud.weapp.HttpServletUtils;
 import org.apache.commons.collections.MapUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 /**
  * 提供登录服务
  */
 
-public class LoginServiceUtil {
+@Service
+public class LoginService {
+    @Autowired
+    private AuthorizationService authorizationService;
+
     private static Map<String, Object> prepareResponseJson() {
         Map<String, Object> ret = Maps.newHashMap();
         ret.put(Constants.WX_SESSION_MAGIC_ID, 1);
@@ -42,16 +48,15 @@ public class LoginServiceUtil {
      *
      * @return 登录成功将返回用户信息
      */
-    public static UserInfo login(HttpServletRequest request, HttpServletResponse response) throws IllegalArgumentException, LoginServiceException, ConfigurationException {
+    public UserInfo login(HttpServletRequest request, HttpServletResponse response) throws IllegalArgumentException, LoginServiceException, ConfigurationException {
         String code = getHeader(Constants.WX_HEADER_CODE, request, response);
         String encryptedData = getHeader(Constants.WX_HEADER_ENCRYPTED_DATA, request, response);
         String iv = getHeader(Constants.WX_HEADER_IV, request, response);
 
-        AuthorizationAPI api = new AuthorizationAPI();
         Map<String, Object> loginResult;
 
         try {
-            loginResult = api.login(code, encryptedData, iv);
+            loginResult = authorizationService.login(code, encryptedData, iv);
         } catch (AuthorizationAPIException apiError) {
             LoginServiceException error = new LoginServiceException(Constants.ERR_LOGIN_FAILED, apiError.getMessage(), apiError);
             throw error;
@@ -74,14 +79,13 @@ public class LoginServiceUtil {
      *
      * @return 如果包含可用会话，将会返回会话对应的用户信息
      */
-    public static UserInfo check(HttpServletRequest request, HttpServletResponse response) throws LoginServiceException, ConfigurationException {
+    public UserInfo check(HttpServletRequest request, HttpServletResponse response) throws LoginServiceException, ConfigurationException {
         String id = getHeader(Constants.WX_HEADER_ID, request, response);
         String skey = getHeader(Constants.WX_HEADER_SKEY, request, response);
 
-        AuthorizationAPI api = new AuthorizationAPI();
         Map<String, Object> checkLoginResult = null;
         try {
-            checkLoginResult = api.checkLogin(id, skey);
+            checkLoginResult = authorizationService.checkLogin(id, skey);
         } catch (AuthorizationAPIException apiError) {
             String errorType = Constants.ERR_CHECK_LOGIN_FAILED;
             if (apiError.getCode() == 60011 || apiError.getCode() == 60012) {

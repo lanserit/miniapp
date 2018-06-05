@@ -7,16 +7,23 @@ import java.util.Map;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.huanghuo.util.JsonUtil;
+import com.qcloud.weapp.Configuration;
 import org.apache.commons.collections.MapUtils;
 
 import com.qcloud.weapp.ConfigurationException;
-import com.qcloud.weapp.ConfigurationManager;
 import com.qcloud.weapp.Hash;
 import com.qcloud.weapp.HttpRequest;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
-class TunnelAPI {
+
+@Component
+class TunnelAPIService {
+    @Autowired
+    private Configuration configuration;
+
     private String getTunnelServerUrl() throws ConfigurationException {
-        return ConfigurationManager.getCurrentConfiguration().getTunnelServerUrl();
+        return configuration.getTunnelServerUrl();
     }
 
     public Tunnel requestConnect(String receiveUrl) throws Exception {
@@ -100,15 +107,15 @@ class TunnelAPI {
 
         requestPayload.put("data", data);
         requestPayload.put("dataEncode", "json");
-        requestPayload.put("tcId", TunnelClient.getId());
+        requestPayload.put("tcId", configuration.getId());
         if (includeTckey) {
-            requestPayload.put("tcKey", TunnelClient.getKey());
+            requestPayload.put("tcKey", configuration.getKey());
         }
         requestPayload.put("signature", signature(data));
         return requestPayload;
     }
 
     private String signature(String data) throws ConfigurationException {
-        return Hash.sha1(data + TunnelClient.getKey());
+        return Hash.sha1(data + configuration.getKey());
     }
 }

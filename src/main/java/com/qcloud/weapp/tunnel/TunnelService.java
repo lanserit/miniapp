@@ -12,21 +12,32 @@ import javax.servlet.http.HttpServletResponse;
 
 import com.google.common.collect.Maps;
 import com.huanghuo.util.JsonUtil;
+import com.qcloud.weapp.Configuration;
 import com.qcloud.weapp.HttpServletUtils;
 import org.apache.commons.collections.MapUtils;
 
 import com.qcloud.weapp.ConfigurationException;
-import com.qcloud.weapp.ConfigurationManager;
 import com.qcloud.weapp.Hash;
-import com.qcloud.weapp.authorization.LoginServiceUtil;
+import com.qcloud.weapp.authorization.LoginService;
 import com.qcloud.weapp.authorization.LoginServiceException;
 import com.qcloud.weapp.authorization.UserInfo;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 
 /**
  * 提供信道服务
  */
-public class TunnelServiceUtil {
+
+@Service
+public class TunnelService {
+    @Autowired
+    private Configuration configuration;
+    @Autowired
+    private LoginService loginService;
+    @Autowired
+    private TunnelAPIService tunnelAPIService;
+
     private static Map<String, Object> getMapForError(Exception error, int errorCode) {
         Map<String, Object> json = Maps.newHashMap();
         json.put("code", errorCode);
@@ -49,7 +60,7 @@ public class TunnelServiceUtil {
      * @param handler 指定信道处理器处理信道事件
      * @param options 指定信道服务的配置
      */
-    public static void handle(HttpServletRequest request, HttpServletResponse response, TunnelHandler handler, TunnelHandleOptions options) throws Exception {
+    public void handle(HttpServletRequest request, HttpServletResponse response, TunnelHandler handler, TunnelHandleOptions options) throws Exception {
         if (request.getMethod().toUpperCase() == "GET") {
             handleGet(request, response, handler, options);
         }
@@ -64,21 +75,20 @@ public class TunnelServiceUtil {
      * GET 请求表示客户端请求进行信道连接，此时会向 SDK 申请信道连接地址，并且返回给客户端
      * 如果配置指定了要求登陆，还会调用登陆服务来校验登陆态并获得用户信息
      */
-    private static void handleGet(HttpServletRequest request, HttpServletResponse response, TunnelHandler handler, TunnelHandleOptions options) throws Exception {
+    private void handleGet(HttpServletRequest request, HttpServletResponse response, TunnelHandler handler, TunnelHandleOptions options) throws Exception {
         Tunnel tunnel = null;
         UserInfo user = null;
 
         if (options != null && options.isCheckLogin()) {
             try {
-                user = LoginServiceUtil.check(request, response);
+                user = loginService.check(request, response);
             } catch (Exception e) {
                 return;
             }
         }
 
-        TunnelAPI api = new TunnelAPI();
         String receiveUrl = buildReceiveUrl(request);
-        tunnel = api.requestConnect(receiveUrl);
+        tunnel = tunnelAPIService.requestConnect(receiveUrl);
 
 
         Map<String, Object> result = Maps.newHashMap();
@@ -90,15 +100,15 @@ public class TunnelServiceUtil {
         handler.onTunnelRequest(tunnel, user);
     }
 
-    private static String buildReceiveUrl(HttpServletRequest request) throws ConfigurationException {
-        URI tunnelServerUri = URI.create(ConfigurationManager.getCurrentConfiguration().getTunnelServerUrl());
+    private String buildReceiveUrl(HttpServletRequest request) throws ConfigurationException {
+        URI tunnelServerUri = URI.create(configuration.getTunnelServerUrl());
         String schema = tunnelServerUri.getScheme();
-        String host = ConfigurationManager.getCurrentConfiguration().getServerHost();
+        String host = configuration.getServerHost();
         String path = request.getRequestURI();
         return schema + "://" + host + path;
     }
 
-    private static void handlePost(HttpServletRequest request, HttpServletResponse response, TunnelHandler handler, TunnelHandleOptions options) throws ConfigurationException, IOException {
+    private void handlePost(HttpServletRequest request, HttpServletResponse response, TunnelHandler handler, TunnelHandleOptions options) throws ConfigurationException, IOException {
         String requestContent = null;
 
         // 1. 读取报文内容
@@ -125,7 +135,7 @@ public class TunnelServiceUtil {
         }
 
         // 3. 检查报文签名
-        String computedSignature = Hash.sha1(data + TunnelClient.getKey());
+        String computedSignature = Hash.sha1(data + configuration.getKey());
         if (!computedSignature.equals(signature)) {
             Map<String, Object> map = Maps.newHashMap();
             map.put("code", 9003);
