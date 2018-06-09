@@ -1,7 +1,8 @@
 package com.huanghuo.wechatapp.web;
 
-import com.qcloud.weapp.authorization.LoginService;
-import com.qcloud.weapp.authorization.UserInfo;
+import com.huanghuo.auth.AuthResult;
+import com.huanghuo.auth.WechatAuthService;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
@@ -16,12 +17,18 @@ import javax.servlet.http.HttpServletResponse;
 @Component
 public class MiniAppVerifyInterceptor extends HandlerInterceptorAdapter {
     @Autowired
-    private LoginService loginService;
+    private WechatAuthService wechatAuthService;
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
-        UserInfo userInfo = loginService.check(request, response);
-        if (userInfo != null) return true;
+        String encrpt_ses_key = request.getParameter("encrpt_ses_key");
+        String openId = request.getParameter("openid");
+        if(StringUtils.isNotEmpty(encrpt_ses_key)&& StringUtils.isNotEmpty(openId)) {
+            if(StringUtils.equals(wechatAuthService.findSesEncrytStrByOpenId(openId), encrpt_ses_key)) {
+                return true;
+            }
+        }
         return false;
+
     }
 }

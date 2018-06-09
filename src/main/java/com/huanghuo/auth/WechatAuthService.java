@@ -1,4 +1,4 @@
-package com.huanghuo.common;
+package com.huanghuo.auth;
 
 import com.google.common.collect.Maps;
 import com.huanghuo.util.MiniAppAuthUtil;
@@ -8,6 +8,7 @@ import org.apache.commons.collections.MapUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.util.Map;
@@ -26,13 +27,23 @@ public class WechatAuthService {
     @Autowired
     private UserService userService;
 
-    public Map<String, Object> auth(String code){
+    @Cacheable(value = "wechatauth",key="#openId")
+    public String findSesEncrytStrByOpenId(String openId){
+        User user =userService.findByOpenId(openId);
+        if(user != null) {
+            return EncryptUtil.sha1(user.getSessionkey());
+        }else {
+            return "";
+        }
+    }
+
+    public AuthResult auth(String code){
+        AuthResult result = new AuthResult();
         Map<String, Object> ret = MiniAppAuthUtil.getAuthInfoFromMiniApp(APP_ID, APP_SECRET, code);
         String openId = MapUtils.getString(ret, "openid", "");
         if(StringUtils.isNotEmpty(openId)) {
             String sessionKey = MapUtils.getString(ret, "session_key", "");
             String uinionId = MapUtils.getString(ret, "unionid", "");
-            Map<String, Object> result = Maps.newHashMap();
             User user = userService.findByOpenId(openId);
             if(user == null) {
                 user.setOpenid(openId);
@@ -51,11 +62,13 @@ public class WechatAuthService {
                     userService.updateByOpenId(user);
                 }
             }
-            result.put("openid", openId);
-            result.put("sessionkey", sessionKey);
-            return result;
+            result.setOpenId(openId);
+            result.setSessionKey(sessionKey);
+            result.setCode(AuthResult.SUCC);
         }else{
-           return ret;
+            result.setCode(MapUtils.getIntValue(ret,"errcode", AuthResult.FAILED));
+            result.setErrMsg(MapUtils.getString(ret,"errmsg", "wechat auth failed"));
         }
+        return result;
     }
 }
