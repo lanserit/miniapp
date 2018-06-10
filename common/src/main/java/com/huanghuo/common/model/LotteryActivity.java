@@ -15,7 +15,10 @@ public class LotteryActivity implements Serializable {
     private int acttype;
     private String name;
     private int actcount;
+    private int totalcount;
     private int maskcount;
+    private int wincount;
+    private int totalwincount;
     private long ctime;
     private long starttime;
     private long endtime;
@@ -153,6 +156,30 @@ public class LotteryActivity implements Serializable {
 
     public void setPic4(String pic4) {
         this.pic4 = pic4;
+    }
+
+    public int getWincount() {
+        return wincount;
+    }
+
+    public void setWincount(int wincount) {
+        this.wincount = wincount;
+    }
+
+    public int getTotalwincount() {
+        return totalwincount;
+    }
+
+    public void setTotalwincount(int totalwincount) {
+        this.totalwincount = totalwincount;
+    }
+
+    public int getTotalcount() {
+        return totalcount;
+    }
+
+    public void setTotalcount(int totalcount) {
+        this.totalcount = totalcount;
     }
 
     public Map<String, Object> getMap() {

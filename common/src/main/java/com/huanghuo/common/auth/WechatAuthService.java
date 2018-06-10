@@ -5,6 +5,8 @@ import com.huanghuo.common.service.UserService;
 import com.huanghuo.common.util.MiniAppAuthUtil;
 import org.apache.commons.collections.MapUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.annotation.Cacheable;
@@ -18,10 +20,23 @@ import java.util.Map;
 
 @Service
 public class WechatAuthService {
-    @Value("weixin.appid")
+    private final static Logger logger = LoggerFactory.getLogger(WechatAuthService.class);
+    @Value("${weixin.appid}")
     private String APP_ID;
-    @Value("weixin.appsecret")
+    @Value("${weixin.appsecret}")
     private String APP_SECRET;
+
+    public static final String WX_HEADER_SKEY = "X-WX-Skey";
+    public static final String WX_HEADER_ENCRYTED_KEY = "X-WX-ENCRYPTED-KEY";
+    public static final String WX_HEADER_OPENID_KEY = "X-WX-ENCRYPTED-OPENID";
+
+    public String getAPP_ID() {
+        return APP_ID;
+    }
+
+    public String getAPP_SECRET() {
+        return APP_SECRET;
+    }
 
     @Autowired
     private UserService userService;
@@ -30,7 +45,7 @@ public class WechatAuthService {
     public String findSesEncrytStrByOpenId(String openId){
         User user =userService.findByOpenId(openId);
         if(user != null) {
-            return EncryptUtil.sha1(user.getSessionkey());
+            return WeixinSignatureUtil.sha1(user.getSessionkey());
         }else {
             return "";
         }
@@ -43,8 +58,10 @@ public class WechatAuthService {
         if(StringUtils.isNotEmpty(openId)) {
             String sessionKey = MapUtils.getString(ret, "session_key", "");
             String uinionId = MapUtils.getString(ret, "unionid", "");
+            logger.info(String.format("skey %s openId %s unionId %s", sessionKey, openId, uinionId));
             User user = userService.findByOpenId(openId);
             if(user == null) {
+                user = new User();
                 user.setOpenid(openId);
                 user.setSessionkey(sessionKey);
                 if (StringUtils.isNotEmpty(uinionId)) {
@@ -58,7 +75,9 @@ public class WechatAuthService {
                     if (StringUtils.isNotEmpty(uinionId)) {
                         user.setUnionid(uinionId);
                     }
-                    userService.updateByOpenId(user);
+                    if(userService.updateByOpenId(user)> 0){
+                        logger.info(openId, " udpate sessionkey ", sessionKey);
+                    }
                 }
             }
             result.setOpenId(openId);

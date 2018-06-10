@@ -1,4 +1,4 @@
-package com.qcloud.weapp.authorization;
+package com.huanghuo.common.auth;
 
 import com.huanghuo.common.util.JsonUtil;
 
@@ -36,7 +36,7 @@ public class UserInfo {
 	 * @param jsonStr
 	 * @return
 	 */
-	static UserInfo BuildFromJson(String jsonStr) {
+	public static UserInfo buildFromJson(String jsonStr) {
 		return JsonUtil.objectFromJson(jsonStr, UserInfo.class);
 	}
 

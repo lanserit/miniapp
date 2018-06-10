@@ -3,6 +3,7 @@ package com.huanghuo.common.service;
 import com.huanghuo.common.mapper.UserMapper;
 import com.huanghuo.common.model.User;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 /**
@@ -29,5 +30,14 @@ public class UserService {
     public int updateByOpenId(User user){
         return userMapper.updateByOpenId(user);
     }
+
+    public int incrAttendCount(long id){
+        return userMapper.incrAttendCount(id);
+    }
+
+    public int incrWinCount(long id){
+        return userMapper.incrWinCount(id);
+    }
+
 
 }

@@ -1,40 +1,105 @@
 package com.huanghuo.common.auth;
 
+import javax.crypto.Cipher;
+import javax.crypto.spec.IvParameterSpec;
+import javax.crypto.spec.SecretKeySpec;
 import java.security.MessageDigest;
+import java.security.SecureRandom;
 
+/**
+ * Created by huangcheng on 2018/6/11.
+ */
 public class EncryptUtil {
-    /**
-     * 计算字符串的 sha1 哈希值
-     * */
-    public static String sha1(String str) {
-        return compute(str, "SHA-1");
+    public static byte[] encrypt(String plainText, String key) throws Exception {
+        byte[] clean = plainText.getBytes();
+
+        // Generating IV.
+        int ivSize = 16;
+        byte[] iv = new byte[ivSize];
+        SecureRandom random = new SecureRandom();
+        random.nextBytes(iv);
+        IvParameterSpec ivParameterSpec = new IvParameterSpec(iv);
+
+        // Hashing key.
+        MessageDigest digest = MessageDigest.getInstance("SHA-256");
+        digest.update(key.getBytes("UTF-8"));
+        byte[] keyBytes = new byte[16];
+        System.arraycopy(digest.digest(), 0, keyBytes, 0, keyBytes.length);
+        SecretKeySpec secretKeySpec = new SecretKeySpec(keyBytes, "AES");
+
+        // Encrypt.
+        Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
+        cipher.init(Cipher.ENCRYPT_MODE, secretKeySpec, ivParameterSpec);
+        byte[] encrypted = cipher.doFinal(clean);
+
+        // Combine IV and encrypted part.
+        byte[] encryptedIVAndText = new byte[ivSize + encrypted.length];
+        System.arraycopy(iv, 0, encryptedIVAndText, 0, ivSize);
+        System.arraycopy(encrypted, 0, encryptedIVAndText, ivSize, encrypted.length);
+
+        return encryptedIVAndText;
     }
 
-    /**
-     * 计算字符串的 md5 哈希值
-     * */
-    public static String md5(String str) {
-        return compute(str, "MD5");
+    public static String decrypt(byte[] encryptedIvTextBytes, String key) throws Exception {
+        int ivSize = 16;
+        int keySize = 16;
+
+        // Extract IV.
+        byte[] iv = new byte[ivSize];
+        System.arraycopy(encryptedIvTextBytes, 0, iv, 0, iv.length);
+        IvParameterSpec ivParameterSpec = new IvParameterSpec(iv);
+
+        // Extract encrypted part.
+        int encryptedSize = encryptedIvTextBytes.length - ivSize;
+        byte[] encryptedBytes = new byte[encryptedSize];
+        System.arraycopy(encryptedIvTextBytes, ivSize, encryptedBytes, 0, encryptedSize);
+
+        // Hash key.
+        byte[] keyBytes = new byte[keySize];
+        MessageDigest md = MessageDigest.getInstance("SHA-256");
+        md.update(key.getBytes());
+        System.arraycopy(md.digest(), 0, keyBytes, 0, keyBytes.length);
+        SecretKeySpec secretKeySpec = new SecretKeySpec(keyBytes, "AES");
+
+        // Decrypt.
+        Cipher cipherDecrypt = Cipher.getInstance("AES/CBC/PKCS5Padding");
+        cipherDecrypt.init(Cipher.DECRYPT_MODE, secretKeySpec, ivParameterSpec);
+        byte[] decrypted = cipherDecrypt.doFinal(encryptedBytes);
+
+        return new String(decrypted);
     }
 
-    public static String compute(String str, String algorithm) {
-        if (str == null) {
-            return null;
-        }
+    public static String fastEncrypt(String strClearText, String strKey) throws Exception {
+        String strData = "";
+
         try {
-            MessageDigest messageDigest = MessageDigest.getInstance(algorithm);
-            messageDigest.update(str.getBytes("utf-8"));
-            return byteArrayToHexString(messageDigest.digest());
+            SecretKeySpec skeyspec = new SecretKeySpec(strKey.getBytes(), "Blowfish");
+            Cipher cipher = Cipher.getInstance("Blowfish");
+            cipher.init(Cipher.ENCRYPT_MODE, skeyspec);
+            byte[] encrypted = cipher.doFinal(strClearText.getBytes());
+            strData = new String(encrypted);
+
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            e.printStackTrace();
+            throw new Exception(e);
         }
+        return strData;
     }
 
-    private static String byteArrayToHexString(byte[] b) {
-        String result = "";
-        for (int i = 0; i < b.length; i++) {
-            result += Integer.toString((b[i] & 0xff) + 0x100, 16).substring(1);
+    public static String fastDecrypt(String strEncrypted, String strKey) throws Exception {
+        String strData = "";
+
+        try {
+            SecretKeySpec skeyspec = new SecretKeySpec(strKey.getBytes(), "Blowfish");
+            Cipher cipher = Cipher.getInstance("Blowfish");
+            cipher.init(Cipher.DECRYPT_MODE, skeyspec);
+            byte[] decrypted = cipher.doFinal(strEncrypted.getBytes());
+            strData = new String(decrypted);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new Exception(e);
         }
-        return result;
+        return strData;
     }
 }

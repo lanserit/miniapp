@@ -31,5 +31,6 @@ public interface LotteryActivityMapper {
     @Update("UPDATE LotteryActivity SET actcount=actcount+1, maskcount=maskcount+1 WHERE actcount < totalcount and id = #{id}")
     int incrActivityCount(@Param("id") long id);
 
-
+    @Update("UPDATE LotteryActivity SET wincount=wincount+1 WHERE wincount < totalwincount and id = #{id}")
+    int incrActivityWinCount(@Param("id") long id);
 }

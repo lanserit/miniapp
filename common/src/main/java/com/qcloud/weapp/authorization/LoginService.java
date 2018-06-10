@@ -71,7 +71,7 @@ public class LoginService {
 
         Map<String, Object> userInfo = MapUtils.getMap(loginResult, "user_info");
 
-        return UserInfo.BuildFromJson(JsonUtil.getJsonString(userInfo));
+        return UserInfo.buildFromJson(JsonUtil.getJsonString(userInfo));
     }
 
     /**
@@ -96,7 +96,7 @@ public class LoginService {
         }
         Map<String, Object> userInfo = MapUtils.getMap(checkLoginResult, "user_info");
 
-        return UserInfo.BuildFromJson(JsonUtil.getJsonString(userInfo));
+        return UserInfo.buildFromJson(JsonUtil.getJsonString(userInfo));
     }
 
     private static String getHeader(String key, HttpServletRequest request, HttpServletResponse response) throws LoginServiceException {

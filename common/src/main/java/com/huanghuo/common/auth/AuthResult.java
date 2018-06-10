@@ -4,8 +4,8 @@ package com.huanghuo.common.auth;
  * Created by huangcheng on 2018/6/9.
  */
 public class AuthResult {
-    public final static int SUCC = 1;
-    public final static int FAILED = 0;
+    public final static int SUCC = 0;
+    public final static int FAILED = -1;
     private String openId;
     private String sessionKey;
     private String unionId;

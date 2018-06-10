@@ -17,7 +17,7 @@ import java.util.List;
 
 @Configuration
 public class WebMvcConfig extends WebMvcConfigurationSupport {
-    
+
     @Override
     public void configureContentNegotiation(
             ContentNegotiationConfigurer configurer) {

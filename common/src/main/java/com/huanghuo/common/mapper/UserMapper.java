@@ -9,23 +9,23 @@ import org.apache.ibatis.annotations.*;
 
 @Mapper
 public interface UserMapper {
-    @Select("SELECT * FROM USER WHERE nickname = #{nickname}")
+    @Select("SELECT * FROM User WHERE nickname = #{nickname}")
     User findByNickName(@Param("nickname") String nickname);
 
-    @Select("SELECT * FROM USER WHERE openid = #{openid}")
+    @Select("SELECT * FROM User WHERE openid = #{openid}")
     User findByOpenId(@Param("openid") String openid);
 
-    @Insert("INSERT INTO USER(nickname, openid, sessionkey, unionid, ctime) VALUES(#{nickname}, #{openid}, #{sessionkey}, #{unionid}, #{ctime})")
+    @Insert("INSERT INTO User(nickname, openid, sessionkey, unionid, ctime, userInfoJson) VALUES(#{nickname}, #{openid}, #{sessionkey}, #{unionid}, #{ctime}, #{userInfoJson})")
     @Options(useGeneratedKeys = true, keyProperty = "id")
     int insert(User user);
 
-    @Update("UPDATE User SET nickname=#{nickname}, sessionkey=#{sessionkey} WHERE openid=#{openid}")
+    @Update("UPDATE User SET nickname=#{nickname}, sessionkey=#{sessionkey}, userInfoJson=#{userInfoJson} WHERE openid=#{openid}")
     int updateByOpenId(User user);
 
-    @Update("UPDATE User SET attendcount=attendcount+1 WHERE openid=#{openid}")
-    int incrAttendCount(@Param("openid") String openid);
+    @Update("UPDATE User SET attendcount=attendcount+1 WHERE id=#{id}")
+    int incrAttendCount(@Param("id") long id);
 
-    @Update("UPDATE User SET wincount=wincount+1 WHERE openid=#{openid}")
-    int incrWinCount(@Param("openid") String openid);
+    @Update("UPDATE User SET wincount=wincount+1 WHERE id=#{id}")
+    int incrWinCount(@Param("id") long id);
 
 }

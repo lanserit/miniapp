@@ -21,6 +21,7 @@ public class IndexController {
     }
 
     @RequestMapping("/error")
+    @ResponseBody
     public String handleError(HttpServletRequest request) {
         Object status = request.getAttribute(RequestDispatcher.ERROR_STATUS_CODE);
 

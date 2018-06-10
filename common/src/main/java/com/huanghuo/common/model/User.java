@@ -1,5 +1,8 @@
 package com.huanghuo.common.model;
 
+import com.huanghuo.common.auth.UserInfo;
+import com.huanghuo.common.util.JsonUtil;
+
 import java.io.Serializable;
 
 /**
@@ -10,6 +13,7 @@ public class User implements Serializable {
     private long id;
     private String openid;
     private String nickname;
+    private String userInfoJson;
     private String sessionkey;
     private String unionid;
     private long ctime;
@@ -78,5 +82,17 @@ public class User implements Serializable {
 
     public void setWincount(int wincount) {
         this.wincount = wincount;
+    }
+
+    public String getUserInfoJson() {
+        return userInfoJson;
+    }
+
+    public void setUserInfoJson(String userInfoJson) {
+        this.userInfoJson = userInfoJson;
+    }
+
+    public UserInfo getUserInfo(){
+        return JsonUtil.objectFromJson(userInfoJson, UserInfo.class);
     }
 }
