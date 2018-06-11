@@ -18,6 +18,9 @@ public interface LotteryWinRecordMapper {
     @Select("SELECT * FROM LotteryWinRecord WHERE actId = #{actId}")
     List<LotteryWinRecord> getRecordsByActId(@Param("actId") long actId);
 
+    @Select("SELECT userId FROM LotteryWinRecord WHERE actId = #{actId}")
+    List<Long> getUserIdsByActId(@Param("actId") long actId);
+
     @Update("UPDATE LotteryWinRecord SET state=#{state} WHERE userId=#{userId} AND state=0")
     int updateStateByUserId(@Param("userId") long userId, @Param("state") int state);
 

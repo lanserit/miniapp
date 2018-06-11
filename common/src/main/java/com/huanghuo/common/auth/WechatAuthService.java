@@ -51,6 +51,11 @@ public class WechatAuthService {
         }
     }
 
+    public Map<String, Object> getAccessToken(){
+        Map<String, Object> ret =MiniAppAuthUtil.getAccessToken(APP_ID, APP_SECRET);
+        return ret;
+    }
+
     public AuthResult auth(String code){
         AuthResult result = new AuthResult();
         Map<String, Object> ret = MiniAppAuthUtil.getAuthInfoFromMiniApp(APP_ID, APP_SECRET, code);

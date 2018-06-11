@@ -7,6 +7,7 @@ import com.huanghuo.common.model.LotteryActivity;
 import com.huanghuo.common.model.LotteryWinRecord;
 import com.huanghuo.common.util.BusinessCode;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -36,6 +37,15 @@ public class LotteryService {
 
     public List<LotteryActivity> getListByState(int acttype, int state, int limit) {
         return lotteryActivityMapper.getListByState(acttype, state, limit);
+    }
+
+    public List<LotteryActivity> getListByEndtimeAndState(int state, long limit) {
+        return lotteryActivityMapper.getListByEndtimeAndState(state, limit);
+    }
+
+
+    public List<LotteryActivity> getList(int limit) {
+        return lotteryActivityMapper.getList(limit);
     }
 
     @Transactional
@@ -76,6 +86,20 @@ public class LotteryService {
             }
         }
         return BusinessCode.FAILED;
+    }
+
+    @Scheduled(cron = "0 0/5 10,23 * * ?")
+    public void generateWinners(){
+        List<LotteryActivity> list = lotteryActivityMapper.getListByEndtimeAndState(LotteryConst.State.LOTTERY, System.currentTimeMillis());
+        for(LotteryActivity activity : list) {
+            if (activity != null && activity.getState() == LotteryConst.State.ONLINE) {
+                if (lotteryActivityMapper.updateStateById(activity.getId(), LotteryConst.State.LOTTERY) > 0) {
+                    List<Long> userIds = lotteryWinRecordMapper.getUserIdsByActId(activity.getId());
+                    int wincount = activity.getWincount();
+
+                }
+            }
+        }
     }
 
 }

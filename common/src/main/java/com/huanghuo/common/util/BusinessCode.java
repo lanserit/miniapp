@@ -21,6 +21,10 @@ public class BusinessCode {
     @Message("活动不存在")
     public static final int ACTIVITY_NOT_EXIST = 10001;
 
+    @Message("活动不能参加")
+    public static final int ACTIVITY_IS_NOT_OPEN = 10002;
+
+
     private static final Map<Integer, String> messageMap;
 
     static {

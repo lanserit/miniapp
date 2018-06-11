@@ -16,8 +16,8 @@ public interface LotteryActivityMapper {
     @Options(useGeneratedKeys = true, keyProperty = "id")
     int insert(LotteryActivity lotteryActivity);
 
-    @Update("UPDATE LotteryActivity SET state=#{newstate} WHERE id=#{id} AND state = #{oldstate}")
-    int updateStateById(@Param("id") long id, @Param("newstate") int newstate, @Param("oldstate") int oldstate);
+    @Update("UPDATE LotteryActivity SET state=#{newstate} WHERE id=#{id}")
+    int updateStateById(@Param("id") long id, @Param("newstate") int newstate);
 
     @Update("UPDATE LotteryActivity SET maskcount=maskcount+#{count} WHERE id=#{id}")
     int incrMaskCountById(@Param("id") long id, @Param("count") int count);
@@ -27,6 +27,12 @@ public interface LotteryActivityMapper {
 
     @Select("SELECT * FROM LotteryActivity WHERE state=#{state} AND acttype=#{acttype} ORDER BY starttime DESC LIMIT #{limit}")
     List<LotteryActivity> getListByState(@Param("acttype") int acttype, @Param("state") int state, @Param("limit") int limit);
+
+    @Select("SELECT * FROM LotteryActivity WHERE state=#{state} ORDER BY endtime > #{endtime} ")
+    List<LotteryActivity> getListByEndtimeAndState(@Param("state") int state, @Param("endtime") long endtime);
+
+    @Select("SELECT * FROM LotteryActivity ORDER BY starttime DESC LIMIT #{limit}")
+    List<LotteryActivity> getList(@Param("limit") int limit);
 
     @Update("UPDATE LotteryActivity SET actcount=actcount+1, maskcount=maskcount+1 WHERE actcount < totalcount and id = #{id}")
     int incrActivityCount(@Param("id") long id);

@@ -38,7 +38,7 @@ public class AuthController {
         Map<String, Object> ret = Maps.newHashMap();
         try{
         if (result.getCode() == AuthResult.SUCC) {
-            ret.put("openId", EncryptUtil.encrypt(result.getOpenId(), wechatAuthService.getAPP_SECRET()));
+            ret.put("openId", result.getOpenId());
             ret.put("encryptSesKey", WeixinSignatureUtil.sha1(result.getSessionKey()));
             return AjaxResult.ajaxSuccess(ret);
         } else {
