@@ -23,7 +23,7 @@ public class WebMvcConfig extends WebMvcConfigurationSupport {
     @Override
     protected void addCorsMappings(CorsRegistry registry) {
         registry.addMapping("/**")
-                .allowedOrigins("h5.68day.com","liangchong.68day.com")
+                .allowedOrigins("http://h5.68day.com","http://liangchong.68day.com:3000")
                 .allowedMethods("PUT", "DELETE","GET","POST")
                 .allowedHeaders("*")
                 .exposedHeaders("access-control-allow-headers",
