@@ -18,7 +18,7 @@ public class LotteryController {
     @Autowired
     private LotteryService lotteryService;
 
-    @RequestMapping("/create")
+    @PostMapping("/create")
     @ResponseBody
     public AjaxResult creteActivity(@RequestBody LotteryActivity activity) {
         activity.setCtime(System.currentTimeMillis());

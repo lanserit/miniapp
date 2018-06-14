@@ -11,8 +11,8 @@ import java.util.List;
 
 @Mapper
 public interface LotteryActivityMapper {
-    @Insert("INSERT INTO LotteryActivity(acttype, name, actcount, totalcount, maskcount, starttime, endtime, ctime, giftjson, extraattrs, state, pic1, pic2, pic3, pic4, pic5) VALUES(#{acttype}, #{name}, #{actcount}, #{totalcount},#{maskcount}, #{starttime}," +
-            "#{endtime}, #{ctime},#{giftjson}, #{extraattrs}, #{state}, #{pic1}, #{pic2},#{pic3},#{pic4},#{pic5})")
+    @Insert("INSERT INTO LotteryActivity(acttype, name, actcount, totalcount, maskcount, starttime, endtime, ctime, giftjson, extraattrs, state, pic1, pic2, pic3, pic4) VALUES(#{acttype}, #{name}, #{actcount}, #{totalcount},#{maskcount}, #{starttime}," +
+            "#{endtime}, #{ctime},#{giftjson}, #{extraattrs}, #{state}, #{pic1}, #{pic2},#{pic3},#{pic4})")
     @Options(useGeneratedKeys = true, keyProperty = "id")
     int insert(LotteryActivity lotteryActivity);
 

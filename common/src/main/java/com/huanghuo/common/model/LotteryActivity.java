@@ -29,6 +29,7 @@ public class LotteryActivity implements Serializable {
     private String pic2;
     private String pic3;
     private String pic4;
+    private String pic5;
 
     public long getId() {
         return id;
@@ -182,19 +183,34 @@ public class LotteryActivity implements Serializable {
         this.totalcount = totalcount;
     }
 
+    public String getPic5() {
+        return pic5;
+    }
+
+    public void setPic5(String pic5) {
+        this.pic5 = pic5;
+    }
+
     public Map<String, Object> getMap() {
         Map<String, Object> map = Maps.newHashMap();
         map.put("id", id);
         map.put("name", name);
         map.put("acttype", acttype);
         map.put("ctime", ctime);
-        map.put("pic1", pic1);
-        map.put("pic2", pic2);
+        map.put("actcount", actcount);
+        map.put("totalcount", totalcount);
+        map.put("totalwincount", totalwincount);
         map.put("giftjson", getGiftJsonMap());
         map.put("state", state);
         map.put("starttime", starttime);
         map.put("endtime", endtime);
         map.put("extraattrs", getExtraAttrsJson());
+        map.put("pic1", pic1);
+        map.put("pic2", pic2);
+        map.put("pic3", pic3);
+        map.put("pic4", pic4);
+        map.put("pic5", pic5);
+
         return map;
     }
 }
