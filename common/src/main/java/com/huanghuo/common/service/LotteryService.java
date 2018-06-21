@@ -11,6 +11,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -88,18 +89,19 @@ public class LotteryService {
         return BusinessCode.FAILED;
     }
 
-    @Scheduled(cron = "0 0/5 10,23 * * ?")
-    public void generateWinners(){
-        List<LotteryActivity> list = lotteryActivityMapper.getListByEndtimeAndState(LotteryConst.State.LOTTERY, System.currentTimeMillis());
-        for(LotteryActivity activity : list) {
-            if (activity != null && activity.getState() == LotteryConst.State.ONLINE) {
-                if (lotteryActivityMapper.updateStateById(activity.getId(), LotteryConst.State.LOTTERY) > 0) {
-                    List<Long> userIds = lotteryWinRecordMapper.getUserIdsByActId(activity.getId());
-                    int wincount = activity.getWincount();
-
+    @Transactional
+    public void generateWinner(LotteryActivity activity){
+        if (activity != null && activity.getState() == LotteryConst.State.ONLINE) {
+            if (lotteryActivityMapper.updateStateById(activity.getId(), LotteryConst.State.LOTTERY) > 0) {
+                List<Long> userIds = lotteryWinRecordMapper.getUserIdsByActId(activity.getId());
+                Collections.shuffle(userIds);
+                int wincount = activity.getWincount();
+                for (int i = 0; i < wincount; i++){
+                    winLottery(activity.getId(), userIds.get(i));
                 }
             }
         }
     }
+
 
 }
