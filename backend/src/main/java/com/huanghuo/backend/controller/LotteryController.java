@@ -4,6 +4,7 @@ import com.huanghuo.common.LotteryConst;
 import com.huanghuo.common.model.LotteryActivity;
 import com.huanghuo.common.service.LotteryService;
 import com.huanghuo.common.util.AjaxResult;
+import com.huanghuo.common.util.BusinessCode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -26,6 +27,16 @@ public class LotteryController {
             return AjaxResult.ajaxSuccess();
         } else {
             return AjaxResult.ajaxFailed("创建失败");
+        }
+    }
+
+    @RequestMapping("/delete")
+    @ResponseBody
+    public AjaxResult deleteActivity(@RequestParam(value="id") long id){
+        if(lotteryService.delete(id, LotteryConst.State.PREONLINE)){
+            return AjaxResult.ajaxSuccess();
+        }else {
+            return AjaxResult.ajaxFailed(BusinessCode.FAILED);
         }
     }
 

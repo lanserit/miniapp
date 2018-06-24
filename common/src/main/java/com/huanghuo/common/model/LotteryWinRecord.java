@@ -11,6 +11,7 @@ public class LotteryWinRecord implements Serializable {
     private long userId;
     private long actId;
     private int state;
+    private String formid;
     private long ctime;
 
     public long getId() {
@@ -43,6 +44,14 @@ public class LotteryWinRecord implements Serializable {
 
     public void setState(int state) {
         this.state = state;
+    }
+
+    public String getFormid() {
+        return formid;
+    }
+
+    public void setFormid(String formid) {
+        this.formid = formid;
     }
 
     public long getCtime() {

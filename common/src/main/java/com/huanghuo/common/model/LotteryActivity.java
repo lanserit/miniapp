@@ -1,5 +1,6 @@
 package com.huanghuo.common.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.google.common.collect.Maps;
 import com.huanghuo.common.util.JsonUtil;
 
@@ -9,6 +10,8 @@ import java.util.Map;
 /**
  * Created by huangcheng on 2018/6/3.
  */
+
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class LotteryActivity implements Serializable {
     private static final long serialVersionUID = 1L;
     private long id;

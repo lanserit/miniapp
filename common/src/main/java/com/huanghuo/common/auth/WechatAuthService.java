@@ -10,6 +10,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
 import java.util.Map;
@@ -25,6 +26,8 @@ public class WechatAuthService {
     private String APP_ID;
     @Value("${weixin.appsecret}")
     private String APP_SECRET;
+    @Value("${weixin.templateid}")
+    private String APP_TEMPLATE_ID;
 
     public static final String WX_HEADER_SKEY = "X-WX-Skey";
     public static final String WX_HEADER_ENCRYTED_KEY = "X-WX-ENCRYPTED-KEY";
@@ -41,6 +44,9 @@ public class WechatAuthService {
     @Autowired
     private UserService userService;
 
+    @Autowired
+    private RedisTemplate<String, Object> redisTemplate;
+
     @Cacheable(value = "wechatauth",key="#openId")
     public String findSesEncrytStrByOpenId(String openId){
         User user =userService.findByOpenId(openId);
@@ -51,9 +57,18 @@ public class WechatAuthService {
         }
     }
 
-    public Map<String, Object> getAccessToken(){
-        Map<String, Object> ret = MiniAppAuthUtil.getAccessToken(APP_ID, APP_SECRET);
-        return ret;
+    public String getAccessToken(){
+        String token = (String)redisTemplate.opsForValue().get(APP_ID+APP_SECRET);
+        if(StringUtils.isEmpty(token)) {
+            Map<String, Object> ret = MiniAppAuthUtil.getAccessToken(APP_ID, APP_SECRET);
+            if(StringUtils.isNotEmpty(MapUtils.getString(ret, "errcode"))){
+                return null;
+            }
+            token = MapUtils.getString(ret, "access_token");
+            int expireTime = MapUtils.getIntValue(ret, "expires_in", 0);
+            redisTemplate.opsForValue().set(APP_ID+APP_SECRET, token, (expireTime - 10)*1000);
+        }
+        return token;
     }
 
     public AuthResult auth(String code){

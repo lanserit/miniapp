@@ -19,6 +19,9 @@ public interface LotteryActivityMapper {
     @Update("UPDATE LotteryActivity SET state=#{newstate} WHERE id=#{id}")
     int updateStateById(@Param("id") long id, @Param("newstate") int newstate);
 
+    @Delete("DELETE FROM LotteryActivity WHERE id = #{id} AND state= #{state}")
+    int deleteByIdAndState(@Param("id") long id, @Param("state") int state);
+
     @Update("UPDATE LotteryActivity SET maskcount=maskcount+#{count} WHERE id=#{id}")
     int incrMaskCountById(@Param("id") long id, @Param("count") int count);
 

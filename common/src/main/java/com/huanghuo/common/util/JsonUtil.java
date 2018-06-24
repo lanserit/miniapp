@@ -2,6 +2,7 @@ package com.huanghuo.common.util;
 
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.lang3.StringUtils;
@@ -20,6 +21,10 @@ public class JsonUtil {
     private static final Logger logger = LoggerFactory.getLogger(JsonUtil.class);
 
     private static final ObjectMapper mapper = new ObjectMapper();
+
+    static {
+        mapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
+    }
 
     public static String getJsonString(Object object) {
         try {

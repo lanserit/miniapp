@@ -32,6 +32,10 @@ public class LotteryService {
         return lotteryActivityMapper.insert(activity) > 0;
     }
 
+    public boolean delete(long id, int state){
+        return lotteryActivityMapper.deleteByIdAndState(id, state)> 0;
+    }
+
     public LotteryActivity getById(long id) {
         return lotteryActivityMapper.getById(id);
     }
@@ -50,12 +54,13 @@ public class LotteryService {
     }
 
     @Transactional
-    public int attendLottery(long actId, long userId) {
+    public int attendLottery(long actId, long userId, String formid) {
         if (lotteryActivityMapper.incrActivityCount(actId) > 0) {
             if (userService.incrAttendCount(userId) > 0) {
                 LotteryWinRecord lw = new LotteryWinRecord();
                 lw.setActId(actId);
                 lw.setUserId(userId);
+                lw.setFormid(formid);
                 lw.setState(LotteryConst.LotteryState.PENDING);
                 lw.setCtime(System.currentTimeMillis());
                 if (lotteryWinRecordMapper.insert(lw) > 0) {

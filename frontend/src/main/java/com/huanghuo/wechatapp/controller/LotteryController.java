@@ -41,7 +41,7 @@ public class LotteryController {
 
     @RequestMapping("/attend")
     @ResponseBody
-    public AjaxResult attendLottery(@RequestParam("actId") long actId, HttpServletRequest request) {
+    public AjaxResult attendLottery(@RequestParam("actId") long actId, @RequestParam("formid") String formid, HttpServletRequest request) {
         String openId = request.getHeader(WechatAuthService.WX_HEADER_OPENID_KEY);
         LotteryActivity activity = lotteryService.getById(actId);
         User user = userService.findByOpenId(openId);
@@ -51,7 +51,7 @@ public class LotteryController {
         }
         else if (activity.getState() == LotteryConst.State.ONLINE) {
             try {
-                if (lotteryService.attendLottery(actId, user.getId()) == BusinessCode.SUCC) {
+                if (lotteryService.attendLottery(actId, user.getId(), formid) == BusinessCode.SUCC) {
                     return AjaxResult.ajaxSuccess();
                 } else {
                     return AjaxResult.ajaxFailed(BusinessCode.FAILED);

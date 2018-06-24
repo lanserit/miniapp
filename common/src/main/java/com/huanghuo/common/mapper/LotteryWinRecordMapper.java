@@ -11,7 +11,7 @@ import java.util.List;
 
 @Mapper
 public interface LotteryWinRecordMapper {
-    @Insert("INSERT INTO LotteryWinRecord(userId, actId, state, ctime) VALUES(#{userId}, #{actId}, #{state}, #{ctime})")
+    @Insert("INSERT INTO LotteryWinRecord(userId, actId, formid, state, ctime) VALUES(#{userId}, #{actId}, #{formid}, #{state}, #{ctime})")
     @Options(useGeneratedKeys = true, keyProperty = "id")
     int insert(LotteryWinRecord lotteryWinRecord);
 
