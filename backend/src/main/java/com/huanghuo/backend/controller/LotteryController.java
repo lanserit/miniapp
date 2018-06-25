@@ -23,17 +23,35 @@ public class LotteryController {
     @ResponseBody
     public AjaxResult creteActivity(@RequestBody LotteryActivity activity) {
         activity.setCtime(System.currentTimeMillis());
-        if (lotteryService.add(activity)) {
+        if(activity.getTotalcount() == 0){
+            activity.setTotalcount(LotteryConst.DEFAULT_TOTAL_COUNT);
+        }
+
+        if(activity.getTotalwincount() == 0){
+            activity.setTotalwincount(LotteryConst.DEFAULT_TOTAL_WIN_COUNT);
+        }
+
+        if (lotteryService.addLottery(activity)) {
             return AjaxResult.ajaxSuccess();
         } else {
             return AjaxResult.ajaxFailed("创建失败");
         }
     }
 
-    @RequestMapping("/delete")
+    @RequestMapping("/updateState")
+    @ResponseBody
+    public AjaxResult updateActivity(@RequestParam(value="id") long id, @RequestParam(value = "newstate") int newstate){
+        if(lotteryService.updateLotteryState(id, newstate)) {
+            return AjaxResult.ajaxSuccess();
+        }else{
+            return AjaxResult.ajaxFailed(BusinessCode.FAILED);
+        }
+    }
+
+    @RequestMapping("/deleteLottery")
     @ResponseBody
     public AjaxResult deleteActivity(@RequestParam(value="id") long id){
-        if(lotteryService.delete(id, LotteryConst.State.PREONLINE)){
+        if(lotteryService.deleteLottery(id, LotteryConst.State.PREONLINE)){
             return AjaxResult.ajaxSuccess();
         }else {
             return AjaxResult.ajaxFailed(BusinessCode.FAILED);

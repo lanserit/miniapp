@@ -1,9 +1,11 @@
 package com.huanghuo.common.model;
 
+import com.google.common.collect.Maps;
 import com.huanghuo.common.auth.UserInfo;
 import com.huanghuo.common.util.JsonUtil;
 
 import java.io.Serializable;
+import java.util.Map;
 
 /**
  * Created by huangcheng on 2018/5/26.
@@ -94,5 +96,14 @@ public class User implements Serializable {
 
     public UserInfo getUserInfo(){
         return JsonUtil.objectFromJson(userInfoJson, UserInfo.class);
+    }
+
+    public Map<String,Object> getMap(){
+        Map<String, Object> ret = Maps.newHashMap();
+        ret.put("nickName", nickname);
+        ret.put("attendCount", attendcount);
+        ret.put("winCount", wincount);
+        ret.put("userInfo", JsonUtil.getMapFromJson(userInfoJson));
+        return ret;
     }
 }

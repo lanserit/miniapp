@@ -1,5 +1,6 @@
 package com.huanghuo.wechatapp.controller;
 
+import com.google.common.collect.Sets;
 import com.huanghuo.common.LotteryConst;
 import com.huanghuo.common.auth.WechatAuthService;
 import com.huanghuo.common.model.LotteryActivity;
@@ -8,6 +9,7 @@ import com.huanghuo.common.service.LotteryService;
 import com.huanghuo.common.service.UserService;
 import com.huanghuo.common.util.AjaxResult;
 import com.huanghuo.common.util.BusinessCode;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -18,6 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
@@ -34,9 +37,27 @@ public class LotteryController {
 
     @RequestMapping("/list")
     @ResponseBody
-    public List<Map<String, Object>> getOpenList(@RequestParam(name = "limit", defaultValue = "5") int limit) {
+    public List<Map<String, Object>> getOpenList(@RequestParam(name = "limit", defaultValue = "5") int limit, HttpServletRequest request) {
         List<LotteryActivity> list = lotteryService.getListByState(LotteryConst.Activity.TIME, LotteryConst.State.ONLINE, limit);
-        return list.stream().map(it -> it.getMap()).collect(Collectors.toList());
+        String openId = request.getHeader(WechatAuthService.WX_HEADER_OPENID_KEY);
+        Set<Long> sets = Sets.newHashSet();
+        if(StringUtils.isNotEmpty(openId)){
+            User user = userService.findByOpenId(openId);
+            List<Long> actIds = lotteryService.getActIdByUserId(user.getId());
+            sets.addAll(actIds);
+        }
+        List<Map<String, Object>> listMap = list.stream().map(it -> {
+            Map<String, Object> ret =it.getMap();
+            if(sets.contains(it.getId())){
+                ret.put("isAttended", true);
+            }else{
+                ret.put("isAttended", false);
+            }
+            return ret;
+        }).collect(Collectors.toList());
+
+
+        return listMap;
     }
 
     @RequestMapping("/attend")

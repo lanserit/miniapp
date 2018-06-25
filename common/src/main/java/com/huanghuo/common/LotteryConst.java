@@ -4,6 +4,8 @@ package com.huanghuo.common;
  * Created by huangcheng on 2018/6/9.
  */
 public interface LotteryConst {
+    int DEFAULT_TOTAL_COUNT = 100;
+    int DEFAULT_TOTAL_WIN_COUNT = 3;
 
     interface Activity {
         int TIME = 1;

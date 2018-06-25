@@ -75,7 +75,7 @@ public class HttpClientUtils {
 
         // Create AuthCache instance
         AuthCache authCache = new BasicAuthCache();
-        // Generate BASIC scheme object and add it to the local auth cache
+        // Generate BASIC scheme object and addLottery it to the local auth cache
         BasicScheme basicAuth = new BasicScheme();
         authCache.put(targetHost, basicAuth);
 

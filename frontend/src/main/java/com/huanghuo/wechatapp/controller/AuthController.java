@@ -50,6 +50,15 @@ public class AuthController {
         }
     }
 
+
+    @RequestMapping("/user/info")
+    @ResponseBody
+    public AjaxResult getUserInfo(HttpServletRequest request){
+        String openId = request.getHeader(WechatAuthService.WX_HEADER_OPENID_KEY);
+        User user = userService.findByOpenId(openId);
+        return AjaxResult.ajaxSuccess(user.getMap());
+    }
+
     @RequestMapping("/user/update")
     @ResponseBody
     public AjaxResult updateUser(@RequestParam("rawData") String rawData, @RequestParam("encryptedData") String encryptedData, @RequestParam("iv") String iv, @RequestParam("signature") String signature, HttpServletRequest request) {

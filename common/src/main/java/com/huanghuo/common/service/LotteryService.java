@@ -28,11 +28,15 @@ public class LotteryService {
     @Autowired
     private UserService userService;
 
-    public boolean add(LotteryActivity activity) {
+    public boolean updateLotteryState(long id, int newstate){
+       return lotteryActivityMapper.updateStateById(id, newstate) > 0;
+    }
+
+    public boolean addLottery(LotteryActivity activity) {
         return lotteryActivityMapper.insert(activity) > 0;
     }
 
-    public boolean delete(long id, int state){
+    public boolean deleteLottery(long id, int state){
         return lotteryActivityMapper.deleteByIdAndState(id, state)> 0;
     }
 
@@ -48,6 +52,9 @@ public class LotteryService {
         return lotteryActivityMapper.getListByEndtimeAndState(state, limit);
     }
 
+    public List<Long> getActIdByUserId(long userId){
+        return lotteryWinRecordMapper.getActIdsByUserId(userId);
+    }
 
     public List<LotteryActivity> getList(int limit) {
         return lotteryActivityMapper.getList(limit);
