@@ -1,9 +1,11 @@
 package com.huanghuo.wechatapp.controller;
 
+import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import com.huanghuo.common.LotteryConst;
 import com.huanghuo.common.auth.WechatAuthService;
 import com.huanghuo.common.model.LotteryActivity;
+import com.huanghuo.common.model.LotteryWinRecord;
 import com.huanghuo.common.model.User;
 import com.huanghuo.common.service.LotteryService;
 import com.huanghuo.common.service.UserService;
@@ -35,16 +37,20 @@ public class LotteryController {
     @Autowired
     private UserService userService;
 
+    private int HEAD_LIMIT = 50;
+
     @RequestMapping("/list")
     @ResponseBody
-    public List<Map<String, Object>> getOpenList(@RequestParam(name = "limit", defaultValue = "5") int limit, HttpServletRequest request) {
-        List<LotteryActivity> list = lotteryService.getListByState(LotteryConst.Activity.TIME, LotteryConst.State.ONLINE, limit);
+    public AjaxResult getOpenList(@RequestParam(name = "id", defaultValue = "0")long id,@RequestParam(name = "limit", defaultValue = "5") int limit, HttpServletRequest request) {
+        List<LotteryActivity> list = lotteryService.getListByState(id, LotteryConst.State.ONLINE, limit);
         String openId = request.getHeader(WechatAuthService.WX_HEADER_OPENID_KEY);
         Set<Long> sets = Sets.newHashSet();
         if(StringUtils.isNotEmpty(openId)){
             User user = userService.findByOpenId(openId);
-            List<Long> actIds = lotteryService.getActIdByUserId(user.getId());
-            sets.addAll(actIds);
+            if(user != null) {
+                List<Long> actIds = lotteryService.getActIdByUserId(user.getId());
+                sets.addAll(actIds);
+            }
         }
         List<Map<String, Object>> listMap = list.stream().map(it -> {
             Map<String, Object> ret =it.getMap();
@@ -56,8 +62,50 @@ public class LotteryController {
             return ret;
         }).collect(Collectors.toList());
 
+        return AjaxResult.ajaxSuccess(listMap);
+    }
 
-        return listMap;
+    @RequestMapping("/detail")
+    @ResponseBody
+    public AjaxResult getLotteryDetail(@RequestParam("actId")long actId, HttpServletRequest request){
+        LotteryActivity lotteryActivity = lotteryService.getById(actId);
+        String openId = request.getHeader(WechatAuthService.WX_HEADER_OPENID_KEY);
+        if(lotteryActivity != null){
+            Map<String, Object> map = lotteryActivity.getMap();
+            User user = userService.findByOpenId(openId);
+            if(user != null){
+                LotteryWinRecord record = lotteryService.getRecordByActIdAndUserId(actId, user.getId());
+                if(record != null){
+                    map.put("isAttended", true);
+                }else{
+                    map.put("isAttended", false);
+                }
+            }
+            return AjaxResult.ajaxSuccess(map);
+        }else{
+            return AjaxResult.ajaxFailed(BusinessCode.FAILED);
+        }
+    }
+
+    @RequestMapping("/headimgs")
+    @ResponseBody
+    public AjaxResult getLotteryHeadImgs(@RequestParam("actId")long actId, @RequestParam("recordId") long recordId){
+        Map<String, Object> ret = lotteryService.getLotteryHeadImages(actId, recordId, HEAD_LIMIT);
+        return AjaxResult.ajaxSuccess(ret);
+    }
+
+    @RequestMapping("/list/user")
+    @ResponseBody
+    public AjaxResult getListByUser(HttpServletRequest request) {
+        String openId = request.getHeader(WechatAuthService.WX_HEADER_OPENID_KEY);
+        List<Map<String, Object>> list = Lists.newArrayList();
+        if(StringUtils.isNotEmpty(openId)){
+            User user = userService.findByOpenId(openId);
+            if(user != null) {
+                list = lotteryService.getActivityInfoByUserId(user.getId());
+            }
+        }
+        return AjaxResult.ajaxSuccess(list);
     }
 
     @RequestMapping("/attend")
@@ -68,14 +116,15 @@ public class LotteryController {
         User user = userService.findByOpenId(openId);
         if(activity == null){
             return AjaxResult.ajaxFailed(BusinessCode.ACTIVITY_NOT_EXIST);
-
         }
-        else if (activity.getState() == LotteryConst.State.ONLINE) {
+        else if (activity.getEndtime() < System.currentTimeMillis()){
+            return AjaxResult.ajaxFailed(BusinessCode.ACTIVITY_IS_END);
+        } else if (activity.getState() == LotteryConst.State.ONLINE) {
             try {
-                if (lotteryService.attendLottery(actId, user.getId(), formid) == BusinessCode.SUCC) {
+                if (lotteryService.attendLottery(actId, user, formid) == BusinessCode.SUCC) {
                     return AjaxResult.ajaxSuccess();
                 } else {
-                    return AjaxResult.ajaxFailed(BusinessCode.FAILED);
+                    return AjaxResult.ajaxFailed(BusinessCode.ACTIVITY_ATTEND_FAILED);
                 }
             }catch (Exception e){
                 return AjaxResult.ajaxFailed(e.getMessage());

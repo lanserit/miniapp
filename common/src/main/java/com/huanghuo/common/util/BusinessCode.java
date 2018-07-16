@@ -18,12 +18,23 @@ public class BusinessCode {
     @Message("失败")
     public static final int FAILED = -1;
 
+    @Message("没有登陆")
+    public static final int NOT_LOGINED = -2;
+
+    @Message("用户不存在")
+    public static final int USER_NOT_EXIST = 100;
+
     @Message("活动不存在")
     public static final int ACTIVITY_NOT_EXIST = 10001;
 
-    @Message("活动不能参加")
+    @Message("活动没有开启")
     public static final int ACTIVITY_IS_NOT_OPEN = 10002;
 
+    @Message("活动已经结束")
+    public static final int ACTIVITY_IS_END = 10003;
+
+    @Message("活动参与失败")
+    public static final int ACTIVITY_ATTEND_FAILED = 10004;
 
     private static final Map<Integer, String> messageMap;
 

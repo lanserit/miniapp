@@ -103,4 +103,9 @@ public class JsonUtil {
 
         return null;
     }
+
+    public static void main(String[] args) {
+        String str ="11_0Jofx-7ImJ5I_r5Sw6wDre1PSFPnGC6lsorWaBADa9hOt9ylNvqZzE36x3sM4ctxxAuUgu0mH3JWAP7itpkStRM_hSq9UZzDmg8FCk8xEDnHRPCCjlRLEsudKRlbC1Zs2EHxKDmAGbn_OZt1XGBhAAAQZU";
+        System.out.print(JsonUtil.getJsonString(str));
+    }
 }

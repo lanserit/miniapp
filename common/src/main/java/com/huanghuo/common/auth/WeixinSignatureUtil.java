@@ -51,9 +51,9 @@ public class WeixinSignatureUtil {
        return decrypt(sessionKey, encryptedData, ivStr, "utf8");
     }
 
-    public static String decrypt(String sessionKey, String encryptedData, String ivStr, String charsetName) {
+    public static String decrypt(String key, String encryptedData, String ivStr, String charsetName) {
         byte[] bData = Base64.decodeBase64(encryptedData);
-        byte[] bSkey = Base64.decodeBase64(sessionKey);
+        byte[] bSkey = Base64.decodeBase64(key);
         byte[] bIv = Base64.decodeBase64(ivStr);
         try {
             SecretKeySpec skeySpec = new SecretKeySpec(bSkey, "AES");

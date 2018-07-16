@@ -6,7 +6,7 @@ package com.huanghuo.common;
 public interface LotteryConst {
     int DEFAULT_TOTAL_COUNT = 100;
     int DEFAULT_TOTAL_WIN_COUNT = 3;
-
+    long DAY_MILLIS = 24*60*60*1000;
     interface Activity {
         int TIME = 1;
         int ATTEND_COUNT = 2;

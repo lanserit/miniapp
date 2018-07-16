@@ -6,10 +6,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.StringHttpMessageConverter;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
-import org.springframework.web.servlet.config.annotation.ContentNegotiationConfigurer;
-import org.springframework.web.servlet.config.annotation.CorsRegistry;
-import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
-import org.springframework.web.servlet.config.annotation.WebMvcConfigurationSupport;
+import org.springframework.web.servlet.config.annotation.*;
 
 import java.nio.charset.Charset;
 import java.util.List;
@@ -23,8 +20,8 @@ public class WebMvcConfig extends WebMvcConfigurationSupport {
     @Override
     protected void addCorsMappings(CorsRegistry registry) {
         registry.addMapping("/**")
-                .allowedOrigins("http://h5.68day.com","http://liangchong.68day.com:3000")
-                .allowedMethods("PUT", "DELETE","GET","POST")
+                .allowedOrigins("http://h5.68day.com","https://miniapp.51yuchen.com")
+                .allowedMethods("PUT", "DELETE","GET","POST","OPTIONS")
                 .allowedHeaders("*")
                 .exposedHeaders("access-control-allow-headers",
                         "access-control-allow-methods",
@@ -73,7 +70,8 @@ public class WebMvcConfig extends WebMvcConfigurationSupport {
 
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
-        registry.addInterceptor(verifyInterceptor()).excludePathPatterns("*");
+        registry.addInterceptor(verifyInterceptor()).addPathPatterns("/**")
+                .excludePathPatterns("/auth/isLogined","/auth/login","/auth/logout");
         super.addInterceptors(registry);
     }
 }
