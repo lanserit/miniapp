@@ -6,6 +6,7 @@ import org.apache.http.NameValuePair;
 import org.apache.http.message.BasicNameValuePair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.util.Base64Utils;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
@@ -63,11 +64,10 @@ public class MiniAppAuthUtil {
     }
 
     public static String encodeEmoji(String nickName) {
-        try {
-            return URLEncoder.encode(nickName, "utf8");
-        } catch (Exception e) {
-            logger.error(e.getMessage(), e);
-            return nickName;
-        }
+        return Base64Utils.encodeToString(nickName.getBytes());
+    }
+
+    public static String decodeEmoji(String nickName) {
+        return new String(Base64Utils.decodeFromString(nickName));
     }
 }

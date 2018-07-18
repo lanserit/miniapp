@@ -3,8 +3,10 @@ package com.huanghuo.common.model;
 import com.google.common.collect.Maps;
 import com.huanghuo.common.auth.UserInfo;
 import com.huanghuo.common.util.JsonUtil;
+import com.huanghuo.common.util.MiniAppAuthUtil;
 import org.apache.commons.collections.MapUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.util.Base64Utils;
 
 import java.io.Serializable;
 import java.util.Map;
@@ -120,11 +122,14 @@ public class User implements Serializable {
 
     public Map<String,Object> getMap(){
         Map<String, Object> ret = Maps.newHashMap();
-        ret.put("nickName", nickname);
+        if(StringUtils.isNotEmpty(nickname)) {
+            ret.put("nickName", MiniAppAuthUtil.decodeEmoji(nickname));
+        }
         ret.put("attendCount", attendcount);
         ret.put("winCount", wincount);
         Map<String, Object> userInfoMap = JsonUtil.getMapFromJson(userInfoJson);
         if(MapUtils.isNotEmpty(userInfoMap)) {
+            userInfoMap.put("nickName", MiniAppAuthUtil.decodeEmoji((String)userInfoMap.get("nickName")));
             userInfoMap.remove("openId");
             userInfoMap.remove("watermark");
             userInfoMap.remove("appId");

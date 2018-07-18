@@ -64,6 +64,7 @@ public class LotteryService {
         }).collect(Collectors.toList());
         Map<String, Object> ret = Maps.newHashMap();
         int size = records.size();
+        ret.put("count", size);
         ret.put("recordId", size > 0 ? records.get(0).getId(): -1);
         ret.put("imgs", imgs);
         return ret;
